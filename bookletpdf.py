@@ -82,43 +82,57 @@ footer_style = ParagraphStyle(
     leading=12)
 
 
-class SpectraGraph():
+class Graph():
 
     def __init__(
-            self, full_width, full_height,
-            x_lims, y_lims, box_offset):
-        self.drawing = Drawing(full_width, full_height)
+            self, 
+            full_width, 
+            full_height,
+            x_lims, 
+            y_lims, 
+            plot_offset=30, 
+            x_label=None,
+            y_label=None,
+            font_size=6):
+
+        self.flowable = Drawing(full_width, full_height)
         self.x_lims = x_lims
         self.y_lims = y_lims
         self.x_delta = x_lims[1] - x_lims[0]
         self.y_delta = y_lims[1] - y_lims[0]
-        self.i_plot_offset = box_offset
-        self.j_plot_offset = box_offset
-        self.width_plot = full_width - box_offset
-        self.height_plot = full_height - box_offset
-        self.font_size = 6
+        self.x_label = x_label
+        self.y_label = y_label
+        self.i_plot_offset = plot_offset
+        self.j_plot_offset = plot_offset
+        self.width_plot = full_width - plot_offset
+        self.height_plot = full_height - plot_offset
+        self.font_size = font_size
         background_color = colors.Color(0.98, 0.98, 0.98)
-        self.drawing.add(
+        self.flowable.add(
             Rect(
                 self.i_plot_offset, self.j_plot_offset,
                 self.width_plot, self.height_plot,
                 fillColor=background_color,
                 strokeColor=None))
-        self.add_labels()
+        self.add_limit_labels()
+        self.add_axis_labels()
 
-    def add_labels(self):
+    def add_axis_labels(self):
+        if self.x_label:
+            self.flowable.add(
+                String(
+                    self.i_plot_offset + 0.5 * self.width_plot,
+                    self.j_plot_offset - 10,
+                    self.x_label,
+                    fontSize=self.font_size,
+                    fontName='Helvetica',
+                    textAnchor='middle',
+                    fillColor=unmatched_color))
+
+    def add_limit_labels(self):
         unmatched_color = colors.Color(0.8, 0.8, 0.8)
-        self.drawing.add(
-            String(
-                self.i_plot_offset + 0.5 * self.width_plot,
-                self.j_plot_offset - 10,
-                'M/Z',
-                fontSize=self.font_size,
-                fontName='Helvetica',
-                textAnchor='middle',
-                fillColor=unmatched_color))
 
-        self.drawing.add(
+        self.flowable.add(
             String(
                 self.i_plot_offset,
                 self.j_plot_offset - 10,
@@ -128,7 +142,7 @@ class SpectraGraph():
                 textAnchor='middle',
                 fillColor=unmatched_color))
 
-        self.drawing.add(
+        self.flowable.add(
             String(
                 self.i_plot_offset + self.width_plot,
                 self.j_plot_offset - 10,
@@ -138,7 +152,7 @@ class SpectraGraph():
                 textAnchor='middle',
                 fillColor=unmatched_color))
 
-        self.drawing.add(
+        self.flowable.add(
             String(
                 self.i_plot_offset - 5,
                 self.j_plot_offset - 2,
@@ -148,7 +162,7 @@ class SpectraGraph():
                 textAnchor='end',
                 fillColor=unmatched_color))
 
-        self.drawing.add(
+        self.flowable.add(
             String(
                 self.i_plot_offset - 5,
                 self.j_plot_offset + self.height_plot - 2,
@@ -169,7 +183,7 @@ class SpectraGraph():
     def add_vert_line(self, x, y, label, color):
         i = self.x_to_i(x)
         j = self.y_to_j(y)
-        self.drawing.add(
+        self.flowable.add(
             Line(
                 i, self.j_plot_offset,
                 i, j,
@@ -187,7 +201,7 @@ class SpectraGraph():
                 fillColor=color))
         group.translate(i + 1, j + 2)
         group.rotate(90)
-        self.drawing.add(group)
+        self.flowable.add(group)
 
 
 class TocDocTemplate(BaseDocTemplate):
@@ -333,18 +347,18 @@ class Booklet():
         self.elements.append(
             ImageFigure(jpg, caption))
 
-    def add_spectra_graph(self, x_vals, y_vals):
+    def add_spectra_graph(self, lines):
+        x_vals = [line[0] for line in lines]
+        y_vals = [line[1] for line in lines]
         x_lims = [0, max(x_vals) * 1.2]
         y_lims = [0, max(y_vals) * 1.2]
         full_width = 450
         full_height = 120
-        graph = SpectraGraph(
+        graph = Graph(
             full_width, full_height, x_lims, y_lims, 30)
-        unmatched_color = colors.Color(0.8, 0.8, 0.8)
-        for x, y in zip(x_vals, y_vals):
-            graph.add_vert_line(
-                x, y, 'haha', unmatched_color)
-        self.elements.append(graph.drawing)
+        for line in lines:
+            graph.add_vert_line(*line)
+        self.elements.append(graph.flowable)
 
     def build(self):
         self.doc.multiBuild(

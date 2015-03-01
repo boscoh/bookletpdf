@@ -1,7 +1,7 @@
 import os
 import random
 
-from bookletpdf import Booklet, title_style, resize_image
+from bookletpdf import Booklet, title_style, resize_image, colors
 
 
 doc = Booklet('booklet1.pdf')
@@ -29,9 +29,18 @@ doc.add_page_break()
 doc.add_toc_header('Next Chapter')
 doc.add_paragraph('More spicey.')
 
-x_vals = [random.randint(0, 100) for i in range(100)]
-y_vals = [random.randint(0, 100) for i in range(100)]
-doc.add_spectra_graph(x_vals, y_vals)
+lines = []
+color_by_label = {
+	'red': colors.Color(1.0, 0, 0),
+	'blue': colors.Color(0, 0, 1.0),
+	'': colors.Color(0.8, 0.8, 0.8)
+}
+for i in range(100):
+	x = random.randint(0, 100)
+	y = random.randint(0, 100)
+	label = random.choice(['', 'red', 'blue'])
+	lines.append([x, y, label, color_by_label[label]])
+doc.add_spectra_graph(lines)
 
 doc.build()
 
