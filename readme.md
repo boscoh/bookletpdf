@@ -2,7 +2,7 @@
 
 # bookletpdf
 
-Bookletpdf simplifies the building of PDF's with table-of-contents, page numbers, figures and graphs.
+Simplifies building a PDF in reportlab with TOC, pages, figures and graphs.
 
 ## Installation
 
@@ -12,15 +12,15 @@ From github:
 
 ## Why?
 
-It's based on the mighty reportlab, which is powerful but somewhat difficult to get started with. Reportlab provides a PDF renderer and a powerful but complicated document manager. You need to understand both well to get started. 
+It's based on the mighty [`reportlab`](), which provides a PDF renderer and a complex document manager. You need to understand both to get started. 
 
-For instance, to get a Table of Contents (TOC), you have to subclass the document manager to handle flowables that you want to add to the TOC. Then the flowable has to be added to your elements. This you have to feed into your document manager. It's just lots and lots of details.
+For instance, to get a Table of Contents (TOC), you have to subclass the document manager to handle flowables to spy on potential TOC entries. Then you have to ensure the gathering of the correct flowable, before you funnel this through the Doc manager. Like I said, a ton of intricate details.
+
+## The Main Object
 
 Bookletpdf abstracts both the renderer and document manager into a single object.
 
 This really ought to be collected in an object.
-
-## The Main Object
 - initialize
 - build
 
