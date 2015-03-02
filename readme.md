@@ -159,4 +159,26 @@ Once the graph has been drawn, you can just add this to the document:
 
 As an example, a vertical line drawer is included `add_vert_line`, which is used  in `booklet1.py`.
 
+## Tables
+
+Tables are provided in `reportlab` that are really quite easy to use. An example is provided in `booklet1.py`. You just need to provide an list of lists that represent the contents of the files, where each list represents the row of the table. Let's call this `data` and run `Table` which is an alias for the `reportlab` object.  
+
+	table = bookletpdf.Table(data, hAlign='LEFT')
+
+Notice the `hAlign` - it controls how the table is horizontally aligned on the page (it could also be `RIGHT` or `CENTER`). 
+
+Now it's important to apply styles to the table and `reportlab` provides a complex table styling scheme. `bookletpdf` provides a useful default
+
+	table_styles = bookletpdf.table_styles
+
+which can be added to, and finally, applied by:
+
+	table.setStyle(bookletpdf.TableStyle(table_styles))
+
+Finally, add `table` to the `doc`:
+
+	doc.elements.append(table)
+
+
+
 

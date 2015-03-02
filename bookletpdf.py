@@ -81,6 +81,16 @@ footer_style = ParagraphStyle(
     fontSize=12,
     leading=12)
 
+border_color = colors.Color(0.9, 0.9, 0.9)
+table_styles = [
+    ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+    ('FONTSIZE', (0, 0), (-1, -1), 6),
+    ('LEADING', (0, 0), (-1, -1), 8),
+    ('TOPPADDING', (0, 0), (-1, -1), 0),
+    ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+    ('INNERGRID', (0, 0), (-1, -1), 0.25, border_color),
+    ('BOX', (0, 0), (-1, -1), 0.25, border_color),
+]
 
 class Graph():
 
@@ -180,7 +190,7 @@ class Graph():
         fraction = (y - self.y_lims[0]) / float(self.y_delta)
         return fraction * self.height_plot + self.j_plot_offset
 
-    def add_vert_line(self, x, y, label, color):
+    def add_vert_line(self, x, y, color, label):
         i = self.x_to_i(x)
         j = self.y_to_j(y)
         self.flowable.add(
@@ -246,9 +256,9 @@ class Booklet():
 
         self.toc = TableOfContents()
 
-        self.footer_tag = "made with http://boscoh.github.io/peptagram"
-        self.footer_tag_link = "http://boscoh.github.io/peptagram"
-        self.footer_font_size = 6
+        self.footer_tag = "made with bookletpdf"
+        self.footer_tag_link = "http://github.com/boscoh/bookletpdf"
+        self.footer_font_size = 8
 
     def draw_blank_page(self, canvas, doc):
         canvas.saveState()
@@ -267,7 +277,7 @@ class Booklet():
         if self.footer_tag:
             canvas.drawRightString(line_length, footer_bottom, self.footer_tag)
             if self.footer_tag_link:
-                rect_left = line_length - canvas.stringWidth(text)
+                rect_left = line_length - canvas.stringWidth(self.footer_tag)
                 link_rect = (line_length, footer_bottom, rect_left, top_line)
                 canvas.linkURL(self.footer_tag_link, link_rect)
 
@@ -346,19 +356,6 @@ class Booklet():
     def add_figure(self, jpg, caption):
         self.elements.append(
             ImageFigure(jpg, caption))
-
-    def add_spectra_graph(self, lines):
-        x_vals = [line[0] for line in lines]
-        y_vals = [line[1] for line in lines]
-        x_lims = [0, max(x_vals) * 1.2]
-        y_lims = [0, max(y_vals) * 1.2]
-        full_width = 450
-        full_height = 120
-        graph = Graph(
-            full_width, full_height, x_lims, y_lims, 30)
-        for line in lines:
-            graph.add_vert_line(*line)
-        self.elements.append(graph.flowable)
 
     def build(self):
         self.doc.multiBuild(
